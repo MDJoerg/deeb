@@ -6,4 +6,5 @@ interface ZIF_DEEB_WS_BL_BSP
   data M_BSP_NAVIGATION type ref to CL_BSP_NAVIGATION .
 
   methods PING .
+  methods SQL_SELECT .
 endinterface.
