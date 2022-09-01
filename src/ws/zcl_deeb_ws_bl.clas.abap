@@ -9,6 +9,7 @@ public section.
 
   class-data GV_BL_CLASS type SEOCLSNAME value 'ZCL_DEEB_WS_BL' ##NO_TEXT.
   class-data GV_MAX_RECORDS type I value 10000 ##NO_TEXT.
+  class-data GV_CHECK_SE16 type ABAP_BOOL value ABAP_TRUE ##NO_TEXT.
 
   methods EXECUTE_SQL
     importing
@@ -116,11 +117,62 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+* -------- check transaction auth
+    IF gv_check_se16 EQ abap_true.
+      AUTHORITY-CHECK OBJECT 'S_TCODE'
+       ID 'TCD' FIELD 'SE16'.
+      DATA(lv_se16) = sy-subrc.
+
+      AUTHORITY-CHECK OBJECT 'S_TCODE'
+       ID 'TCD' FIELD 'SE16N'.
+      DATA(lv_se16n) = sy-subrc.
+
+      IF NOT ( lv_se16 = 0 OR lv_se16n = 0 ).
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+
 * -------- check select in statement
     DATA(lv_upper) = to_upper( iv_sql ).
     IF NOT lv_upper CS 'SELECT'.
       RETURN.
     ENDIF.
+
+* -------- filter required tables from select
+    DATA lv_next_is_table TYPE abap_bool.
+    DATA lt_tables TYPE TABLE OF tabname.
+
+    SPLIT iv_sql AT ' ' INTO TABLE DATA(lt_parts).
+
+    LOOP AT lt_parts ASSIGNING FIELD-SYMBOL(<lv_part>).
+      DATA(lv_part) = to_upper( <lv_part> ).
+      CONDENSE lv_part.
+      IF lv_part EQ 'FROM'
+        OR lv_part EQ 'JOIN'.
+        lv_next_is_table = abap_true.
+      ELSEIF lv_next_is_table EQ abap_true.
+        APPEND lv_part TO lt_tables.
+        lv_next_is_table = abap_false.
+      ENDIF.
+    ENDLOOP.
+
+
+* ------- check tables extracted
+    IF lt_tables[] IS INITIAL.
+      RETURN. " unknown select
+    ENDIF.
+
+* ------- check authorization for table
+    LOOP AT lt_tables ASSIGNING FIELD-SYMBOL(<lv_tabname>).
+      AUTHORITY-CHECK OBJECT 'S_TABU_NAM'
+       ID 'ACTVT' FIELD '03' " display
+       ID 'TABLE' FIELD <lv_tabname>.
+      IF sy-subrc <> 0.
+        RETURN.
+      ENDIF.
+    ENDLOOP.
+
 
 * -------- finally success
     rv_allowed = abap_true.
