@@ -10,20 +10,6 @@
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>
    </VSEOINTERF>
-   <DESCRIPTIONS>
-    <SEOCOMPOTX>
-     <CLSNAME>ZIF_DEEB_WS_BL_BSP</CLSNAME>
-     <CMPNAME>M_BSP_NAVIGATION</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Business Server Pages (BSP) Navigation</DESCRIPT>
-    </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>ZIF_DEEB_WS_BL_BSP</CLSNAME>
-     <CMPNAME>M_BSP_PAGE</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Business Server Pages (BSP) Abstract Basis Class Page</DESCRIPT>
-    </SEOCOMPOTX>
-   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>

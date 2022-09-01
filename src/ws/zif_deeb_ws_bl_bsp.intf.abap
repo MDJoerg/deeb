@@ -2,9 +2,14 @@ interface ZIF_DEEB_WS_BL_BSP
   public .
 
 
-  data M_BSP_PAGE type ref to CL_BSP_PAGE_BASE .
-  data M_BSP_NAVIGATION type ref to CL_BSP_NAVIGATION .
+  interfaces ZIF_DEEB_UT_BSP_SRV .
 
-  methods PING .
+  aliases M_BSP_NAVIGATION
+    for ZIF_DEEB_UT_BSP_SRV~M_BSP_NAVIGATION .
+  aliases M_BSP_PAGE
+    for ZIF_DEEB_UT_BSP_SRV~M_BSP_PAGE .
+  aliases PING
+    for ZIF_DEEB_UT_BSP_SRV~PING .
+
   methods SQL_SELECT .
 endinterface.

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_DEEB_WS_BL</CLSNAME>
+    <CLSNAME>ZCL_DEEB_UT_BSP_SRV</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>DEEB WebService BL</DESCRIPT>
+    <DESCRIPT>DEEB Utilitiy BSP based REST Webservice</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
@@ -13,10 +13,10 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_DEEB_WS_BL</CLSNAME>
-     <CMPNAME>GV_BL_CLASS</CMPNAME>
+     <CLSNAME>ZCL_DEEB_UT_BSP_SRV</CLSNAME>
+     <CMPNAME>GV_ENCODING</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Object Type Name</DESCRIPT>
+     <DESCRIPT>Identifier for Character Format (UTF-8, UCS-2, ...)</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>
