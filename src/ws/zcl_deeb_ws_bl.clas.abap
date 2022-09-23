@@ -267,4 +267,122 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
+
+
+  METHOD zif_deeb_ws_bl_bsp~table_update.
+
+* ------- local data
+    DATA(lv_text) = ||.
+    DATA lr_data TYPE REF TO data.
+    FIELD-SYMBOLS: <tab> TYPE table.
+
+
+
+    TRY.
+* -------- get request payload and check content
+        DATA(lv_json) = get_request( )->get_cdata( ).
+        IF lv_json IS INITIAL OR lv_json(1) NE '{'.
+          set_response_bad_request( |Missing JSON payload| ).
+          RETURN.
+        ENDIF.
+
+* --------- get params
+        DATA lv_timestamp       TYPE timestampl.
+        DATA lv_delete          TYPE abap_bool VALUE abap_true.
+        DATA lv_with_timestamp  TYPE abap_bool VALUE abap_true.
+
+* --------- unpack json
+        DATA ls_params TYPE zdeeb_ws_s_table_update.
+        cl_fdt_json=>json_to_data(
+          EXPORTING
+            iv_json = lv_json
+          CHANGING
+            ca_data = ls_params
+        ).
+        IF ls_params IS INITIAL
+          OR ls_params-table IS INITIAL
+          OR ls_params-data IS INITIAL.
+          set_response_bad_request( |Invalid JSON payload| ).
+          RETURN.
+        ENDIF.
+
+* --------- create table
+        CREATE DATA lr_data TYPE TABLE OF (ls_params-table).
+        IF lr_data IS INITIAL.
+          set_response_bad_request( |Invalid table name { ls_params-table }| ).
+          RETURN.
+        ELSE.
+          ASSIGN lr_data->* TO <tab>.
+        ENDIF.
+
+
+* ---------- transform
+        cl_fdt_json=>json_to_data(
+          EXPORTING
+            iv_json = ls_params-data
+          CHANGING
+            ca_data = <tab>
+        ).
+
+        IF <tab>[] IS INITIAL.
+          set_response_bad_request( |Invalid data for table { ls_params-table }| ).
+          RETURN.
+        ENDIF.
+
+
+* --------- prepare and check timestamp
+        DATA(lv_lin) = lines( <tab> ).
+        IF ls_params-with_timestamp EQ abap_true.
+          IF ls_params-timestamp IS INITIAL.
+            GET TIME STAMP FIELD ls_params-timestamp.
+          ENDIF.
+
+          LOOP AT <tab> ASSIGNING FIELD-SYMBOL(<wa>).
+            ASSIGN COMPONENT 'TIMESTAMP' OF STRUCTURE <wa> TO FIELD-SYMBOL(<ts>).
+            IF <ts> IS NOT ASSIGNED.
+              set_response_bad_request( |table { ls_params-table } has no timestamp field| ).
+              RETURN.
+            ELSE.
+              <ts> = ls_params-timestamp.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+
+
+* ----------- modify database
+        IF ls_params-delete EQ abap_true.
+          DELETE FROM (ls_params-table).
+        ENDIF.
+
+        MODIFY (ls_params-table) FROM TABLE <tab>.
+        COMMIT WORK.
+
+
+* --------- set response
+        set_response_string(
+            iv_content      = |{ lv_lin } lines of table { ls_params-table } updated|
+            iv_content_type = 'text/json'
+        ).
+
+        set_response_status(
+            iv_code    = 200
+            iv_text    = 'OK'
+        ).
+
+
+* -------- catch exceptions
+      CATCH cx_root INTO DATA(lx_ex).
+        lv_text = lx_ex->get_text( ).
+        set_response_status(
+            iv_code    = 500
+            iv_text    = lv_text
+        ).
+        set_response_string(
+            iv_content      = lv_text
+            iv_content_type = 'text/text'
+        ).
+    ENDTRY.
+
+
+  ENDMETHOD.
 ENDCLASS.

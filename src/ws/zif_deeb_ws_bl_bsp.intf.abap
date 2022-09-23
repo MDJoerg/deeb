@@ -1,15 +1,18 @@
-interface ZIF_DEEB_WS_BL_BSP
-  public .
+INTERFACE zif_deeb_ws_bl_bsp
+  PUBLIC .
 
 
-  interfaces ZIF_DEEB_UT_BSP_SRV .
+  INTERFACES zif_deeb_ut_bsp_srv .
 
-  aliases M_BSP_NAVIGATION
-    for ZIF_DEEB_UT_BSP_SRV~M_BSP_NAVIGATION .
-  aliases M_BSP_PAGE
-    for ZIF_DEEB_UT_BSP_SRV~M_BSP_PAGE .
-  aliases PING
-    for ZIF_DEEB_UT_BSP_SRV~PING .
+  ALIASES m_bsp_navigation
+    FOR zif_deeb_ut_bsp_srv~m_bsp_navigation .
+  ALIASES m_bsp_page
+    FOR zif_deeb_ut_bsp_srv~m_bsp_page .
+  ALIASES ping
+    FOR zif_deeb_ut_bsp_srv~ping .
 
-  methods SQL_SELECT .
-endinterface.
+  METHODS sql_select .
+
+  METHODS table_update.
+
+ENDINTERFACE.

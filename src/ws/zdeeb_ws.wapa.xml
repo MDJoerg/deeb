@@ -48,6 +48,18 @@
       <DESCRIPT>Select Data via SQL</DESCRIPT>
      </ATTRIBUTES>
     </item>
+    <item>
+     <ATTRIBUTES>
+      <APPLNAME>ZDEEB_WS</APPLNAME>
+      <PAGEKEY>TABLE_UPDATE</PAGEKEY>
+      <PAGENAME>table_update</PAGENAME>
+      <MIMETYPE>application/octet-stream</MIMETYPE>
+      <LAYOUTLANGU>E</LAYOUTLANGU>
+      <VERSION>A</VERSION>
+      <LANGU>E</LANGU>
+      <DESCRIPT>Update table</DESCRIPT>
+     </ATTRIBUTES>
+    </item>
    </PAGES>
   </asx:values>
  </asx:abap>
