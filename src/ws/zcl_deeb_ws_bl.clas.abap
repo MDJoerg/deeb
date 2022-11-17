@@ -328,26 +328,43 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
           set_response_bad_request( |Invalid data for table { ls_params-table }| ).
           RETURN.
         ENDIF.
+        DATA(lv_lin) = lines( <tab> ).
+
+* ------------ create workarea and check for fields
+        DATA: lr_wa TYPE REF TO data.
+        CREATE DATA lr_wa LIKE LINE OF <tab>.
+        ASSIGN lr_wa->* TO FIELD-SYMBOL(<wa>).
+        DATA(lv_special_fields) = abap_false.
 
 
 * --------- prepare and check timestamp
-        DATA(lv_lin) = lines( <tab> ).
-        IF ls_params-with_timestamp EQ abap_true.
+        DATA(lv_special_timestamp) = abap_false.
+        ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO FIELD-SYMBOL(<lv_timestamp>).
+        IF <lv_timestamp> IS ASSIGNED.
+          lv_special_fields = abap_true.
+          lv_special_timestamp = abap_true.
           IF ls_params-timestamp IS INITIAL.
             GET TIME STAMP FIELD ls_params-timestamp.
           ENDIF.
+        ELSE.
+          IF ls_params-with_timestamp EQ abap_true.
+            set_response_bad_request( |table { ls_params-table } has no timestamp field| ).
+            RETURN.
+          ENDIF.
+        ENDIF.
 
-          LOOP AT <tab> ASSIGNING FIELD-SYMBOL(<wa>).
-            ASSIGN COMPONENT 'TIMESTAMP' OF STRUCTURE <wa> TO FIELD-SYMBOL(<ts>).
-            IF <ts> IS NOT ASSIGNED.
-              set_response_bad_request( |table { ls_params-table } has no timestamp field| ).
-              RETURN.
-            ELSE.
-              <ts> = ls_params-timestamp.
+
+
+* ----------- loop and prepare data
+        IF lv_special_fields EQ abap_true.
+          LOOP AT <tab> ASSIGNING <wa>.
+*           set timestamp
+            IF lv_special_timestamp eq abap_true.
+              ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO <lv_timestamp>.
+              <lv_timestamp> = ls_params-timestamp.
             ENDIF.
           ENDLOOP.
         ENDIF.
-
 
 * ----------- modify database
         IF ls_params-delete EQ abap_true.

@@ -1,18 +1,18 @@
-INTERFACE zif_deeb_ws_bl_bsp
-  PUBLIC .
+interface ZIF_DEEB_WS_BL_BSP
+  public .
 
 
-  INTERFACES zif_deeb_ut_bsp_srv .
+  interfaces ZIF_DEEB_UT_BSP_SRV .
 
-  ALIASES m_bsp_navigation
-    FOR zif_deeb_ut_bsp_srv~m_bsp_navigation .
-  ALIASES m_bsp_page
-    FOR zif_deeb_ut_bsp_srv~m_bsp_page .
-  ALIASES ping
-    FOR zif_deeb_ut_bsp_srv~ping .
+  aliases M_BSP_NAVIGATION
+    for ZIF_DEEB_UT_BSP_SRV~M_BSP_NAVIGATION .
+  aliases M_BSP_PAGE
+    for ZIF_DEEB_UT_BSP_SRV~M_BSP_PAGE .
+  aliases PING
+    for ZIF_DEEB_UT_BSP_SRV~PING .
 
-  METHODS sql_select .
+  constants C_TABLE_FIELD_TIMESTAMP type STRING value 'REC_TIMESTAMP' ##NO_TEXT.
 
-  METHODS table_update.
-
-ENDINTERFACE.
+  methods SQL_SELECT .
+  methods TABLE_UPDATE .
+endinterface.

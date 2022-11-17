@@ -186,6 +186,12 @@ CLASS ZCL_DEEB_UT_BSP_SRV IMPLEMENTATION.
 
 
   method ZIF_DEEB_UT_BSP_SRV~PING.
+
+* --------- for debugging issues
+    data lt_header type TIHTTPNVP.
+    get_request( )->get_header_fields( CHANGING fields = lt_header ).
+
+* --------- send response
     set_response_status(
         iv_code    = 200
         iv_text    = |OK|
