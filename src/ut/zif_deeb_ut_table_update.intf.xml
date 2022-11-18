@@ -3,13 +3,21 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_DEEB_C</CLSNAME>
+    <CLSNAME>ZIF_DEEB_UT_TABLE_UPDATE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>DEEB Constants</DESCRIPT>
+    <DESCRIPT>DEEB: Table Update Util</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>
    </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_DEEB_UT_TABLE_UPDATE</CLSNAME>
+     <CMPNAME>UPDATE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>update table data in database</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>

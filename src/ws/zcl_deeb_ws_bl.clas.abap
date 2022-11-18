@@ -273,7 +273,11 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
 
 * ------- local data
     DATA(lv_text) = ||.
+    DATA(lv_error) = ||.
     DATA lr_data TYPE REF TO data.
+    DATA ls_upd_params TYPE zdeeb_s_table_update_par.
+
+
     FIELD-SYMBOLS: <tab> TYPE table.
 
 
@@ -286,19 +290,21 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
           RETURN.
         ENDIF.
 
-* --------- get params
-        DATA lv_timestamp       TYPE timestampl.
-        DATA lv_delete          TYPE abap_bool VALUE abap_true.
-        DATA lv_with_timestamp  TYPE abap_bool VALUE abap_true.
+* ------- init tooling
+        DATA(lr_json) = zcl_deeb_factory=>create_json_converter( ).
+        DATA(lr_updater) =  zcl_deeb_factory=>create_table_updater( ).
 
-* --------- unpack json
+
+
+* --------- unpack json params
         DATA ls_params TYPE zdeeb_ws_s_table_update.
-        cl_fdt_json=>json_to_data(
+        lr_json->from_json(
           EXPORTING
             iv_json = lv_json
           CHANGING
             ca_data = ls_params
         ).
+
         IF ls_params IS INITIAL
           OR ls_params-table IS INITIAL
           OR ls_params-data IS INITIAL.
@@ -306,86 +312,54 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
           RETURN.
         ENDIF.
 
-* --------- create table
-        CREATE DATA lr_data TYPE TABLE OF (ls_params-table).
+* --------- create table from json
+        lr_data = lr_updater->get_table_from_json(
+                    EXPORTING
+                      iv_table = ls_params-table                " Table Name
+                      iv_json  = ls_params-data
+                    IMPORTING
+                      ev_error = lv_error
+                  ).
         IF lr_data IS INITIAL.
-          set_response_bad_request( |Invalid table name { ls_params-table }| ).
+          set_response_bad_request( lv_error ).
           RETURN.
         ELSE.
           ASSIGN lr_data->* TO <tab>.
+          DATA(lv_lin) = lines( <tab> ).
         ENDIF.
 
 
-* ---------- transform
-        cl_fdt_json=>json_to_data(
-          EXPORTING
-            iv_json = ls_params-data
-          CHANGING
-            ca_data = <tab>
-        ).
-
-        IF <tab>[] IS INITIAL.
-          set_response_bad_request( |Invalid data for table { ls_params-table }| ).
+        IF lv_lin = 0.
+          set_response_bad_request( |No data to update| ).
           RETURN.
-        ENDIF.
-        DATA(lv_lin) = lines( <tab> ).
-
-* ------------ create workarea and check for fields
-        DATA: lr_wa TYPE REF TO data.
-        CREATE DATA lr_wa LIKE LINE OF <tab>.
-        ASSIGN lr_wa->* TO FIELD-SYMBOL(<wa>).
-        DATA(lv_special_fields) = abap_false.
-
-
-* --------- prepare and check timestamp
-        DATA(lv_special_timestamp) = abap_false.
-        ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO FIELD-SYMBOL(<lv_timestamp>).
-        IF <lv_timestamp> IS ASSIGNED.
-          lv_special_fields = abap_true.
-          lv_special_timestamp = abap_true.
-          IF ls_params-timestamp IS INITIAL.
-            GET TIME STAMP FIELD ls_params-timestamp.
-          ENDIF.
         ELSE.
-          IF ls_params-with_timestamp EQ abap_true.
-            set_response_bad_request( |table { ls_params-table } has no timestamp field| ).
+* ------- update table now
+          MOVE-CORRESPONDING ls_params TO ls_upd_params.
+          IF lr_updater->update(
+               EXPORTING
+                 is_params         = ls_upd_params
+*           it_table          =
+                 ir_table          = lr_data
+               IMPORTING
+                 ev_message        = lv_error
+                 ev_modified_lines = lv_lin
+             ) EQ abap_false.
+            set_response_bad_request( lv_error ).
             RETURN.
           ENDIF.
-        ENDIF.
-
-
-
-* ----------- loop and prepare data
-        IF lv_special_fields EQ abap_true.
-          LOOP AT <tab> ASSIGNING <wa>.
-*           set timestamp
-            IF lv_special_timestamp eq abap_true.
-              ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO <lv_timestamp>.
-              <lv_timestamp> = ls_params-timestamp.
-            ENDIF.
-          ENDLOOP.
-        ENDIF.
-
-* ----------- modify database
-        IF ls_params-delete EQ abap_true.
-          DELETE FROM (ls_params-table).
-        ENDIF.
-
-        MODIFY (ls_params-table) FROM TABLE <tab>.
-        COMMIT WORK.
 
 
 * --------- set response
-        set_response_string(
-            iv_content      = |{ lv_lin } lines of table { ls_params-table } updated|
-            iv_content_type = 'text/json'
-        ).
+          set_response_string(
+              iv_content      = |{ lv_lin } lines of table { ls_params-table } updated|
+              iv_content_type = 'text/json'
+          ).
 
-        set_response_status(
-            iv_code    = 200
-            iv_text    = 'OK'
-        ).
-
+          set_response_status(
+              iv_code    = 200
+              iv_text    = 'OK'
+          ).
+        ENDIF.
 
 * -------- catch exceptions
       CATCH cx_root INTO DATA(lx_ex).
