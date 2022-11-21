@@ -270,4 +270,15 @@ CLASS ZCL_DEEB_UT_DDIC_UTIL IMPLEMENTATION.
       ENDIF.
     ENDIF.
   ENDMETHOD.
+
+
+  METHOD zif_deeb_ut_ddic_util~is_boolean_true.
+    IF iv_check IS NOT INITIAL
+      AND strlen( iv_check ) > 0.
+      DATA(lv_string) = CONV string( iv_check ).
+      IF lv_string(1) CA 'xXtT1'.
+        rv_bool_true = abap_true.
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
 ENDCLASS.

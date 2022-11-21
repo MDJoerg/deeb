@@ -97,11 +97,18 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
 
     CREATE DATA mr_wa LIKE LINE OF <tab>.
     ASSIGN mr_wa->* TO FIELD-SYMBOL(<wa>).
+
     DATA(lv_special_fields) = abap_false.
+    DATA(lt_fields) = get_util( )->get_ddic_fields_from_struc( <wa> ).
 
 
 * --------- prepare and check timestamp
     DATA(lv_special_timestamp) = abap_false.
+
+    IF ms_params-no_check_cell_value = abap_false.
+      lv_special_fields = abap_true.
+    ENDIF.
+
     ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO FIELD-SYMBOL(<lv_timestamp>).
     IF <lv_timestamp> IS ASSIGNED.
       lv_special_fields = abap_true.
@@ -128,6 +135,19 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
           ASSIGN COMPONENT zif_deeb_ws_bl_bsp=>c_table_field_timestamp OF STRUCTURE <wa> TO <lv_timestamp>.
           <lv_timestamp> = ms_params-timestamp.
         ENDIF.
+
+*       check empty
+        IF ms_params-no_check_cell_value EQ abap_false.
+          LOOP AT lt_fields ASSIGNING FIELD-SYMBOL(<ls_field>)
+            WHERE datatype = 'CHAR'.
+            ASSIGN COMPONENT <ls_field>-fieldname OF STRUCTURE <wa> TO FIELD-SYMBOL(<lv_field>).
+            IF <lv_field> IS ASSIGNED AND <lv_field> = 'NaN'.
+              CLEAR <lv_field>.
+              UNASSIGN <lv_field>.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+
 
 *       check duplicates
         IF ms_params-duplicates_allowed EQ abap_false

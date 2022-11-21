@@ -5,7 +5,7 @@ interface ZIF_DEEB_UT_DDIC_UTIL
   methods GET_DDIC_FIELDS_FROM_STRUC
     importing
       !IS_DATA type DATA
-      !IV_LANG type LANGUAGE
+      !IV_LANG type LANGUAGE default SY-LANGU
       !IV_WITH_SUB type ABAP_BOOL default ABAP_FALSE
     returning
       value(RT_FIELDS) type DDFIELDS .
@@ -62,4 +62,9 @@ interface ZIF_DEEB_UT_DDIC_UTIL
       !IV_WHERE type STRING optional
     returning
       value(RV_MODIFIED) type ABAP_BOOL .
+  methods IS_BOOLEAN_TRUE
+    importing
+      !IV_CHECK type DATA
+    returning
+      value(RV_BOOL_TRUE) type ABAP_BOOL .
 endinterface.

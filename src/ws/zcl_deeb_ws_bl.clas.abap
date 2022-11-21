@@ -312,6 +312,13 @@ CLASS ZCL_DEEB_WS_BL IMPLEMENTATION.
           RETURN.
         ENDIF.
 
+* --------- check flag fields
+    ls_params-with_timestamp      = lr_updater->get_util( )->IS_BOOLEAN_TRUE( ls_params-with_timestamp ).
+    ls_params-duplicates_allowed  = lr_updater->get_util( )->IS_BOOLEAN_TRUE( ls_params-duplicates_allowed ).
+    ls_params-delete              = lr_updater->get_util( )->IS_BOOLEAN_TRUE( ls_params-delete ).
+    ls_params-no_check_cell_value = lr_updater->get_util( )->IS_BOOLEAN_TRUE( ls_params-no_check_cell_value ).
+
+
 * --------- create table from json
         lr_data = lr_updater->get_table_from_json(
                     EXPORTING
