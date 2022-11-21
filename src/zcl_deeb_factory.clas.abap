@@ -6,6 +6,9 @@ public section.
 
   interfaces ZIF_DEEB_C .
 
+  class-methods CREATE_DDIC_UTIL
+    returning
+      value(RR_INSTANCE) type ref to ZIF_DEEB_UT_DDIC_UTIL .
   class-methods CREATE_JSON_CONVERTER
     returning
       value(RR_INSTANCE) type ref to ZIF_DEEB_UT_JSON_CONVERT .
@@ -67,5 +70,10 @@ CLASS ZCL_DEEB_FACTORY IMPLEMENTATION.
 
   METHOD create_table_updater.
     rr_instance ?= create_instance( 'ZIF_DEEB_UT_TABLE_UPDATE' ).
+  ENDMETHOD.
+
+
+  METHOD CREATE_DDIC_UTIL.
+    rr_instance ?= create_instance( 'ZIF_DEEB_UT_DDIC_UTIL' ).
   ENDMETHOD.
 ENDCLASS.

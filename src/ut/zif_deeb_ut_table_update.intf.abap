@@ -20,4 +20,7 @@ interface ZIF_DEEB_UT_TABLE_UPDATE
       !EV_ERROR type STRING
     returning
       value(RR_TABLE) type ref to DATA .
+  methods GET_UTIL
+    returning
+      value(RR_UTIL) type ref to ZIF_DEEB_UT_DDIC_UTIL .
 endinterface.
