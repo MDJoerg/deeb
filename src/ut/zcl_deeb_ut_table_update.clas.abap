@@ -14,6 +14,8 @@ protected section.
   data MR_TABLE type ref to DATA .
   data MR_WA type ref to DATA .
   data MR_UTIL type ref to ZIF_DEEB_UT_DDIC_UTIL .
+  data MR_EXIT type ref to ZIF_DEEB_EXIT_TABLE_UPDATE .
+  data MV_EXIT_CHECKED type ABAP_BOOL value ABAP_FALSE ##NO_TEXT.
 
   methods IS_RECORD_MODIFIED
     importing
@@ -70,6 +72,11 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
 
 * --------- local data definition
     FIELD-SYMBOLS: <tab> TYPE table.
+    DATA(lv_special_fields) = abap_false.
+    DATA: lv_exit_error TYPE abap_bool.
+    DATA: lv_exit_skip TYPE abap_bool.
+    DATA: lv_message TYPE string.
+
 
 * --------- init and check
     IF it_table[] IS INITIAL AND ir_table IS INITIAL.
@@ -90,6 +97,14 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    IF is_params-exit_class IS NOT INITIAL.
+      IF zif_deeb_ut_table_update~init_exit( is_params-exit_class ) EQ abap_false.
+        ev_message = |invalid exit class - { is_params-exit_class }|.
+        RETURN.
+      ELSE.
+        lv_special_fields = abap_true.
+      ENDIF.
+    ENDIF.
 
 
 * ------------ prepare, create workarea and check for fields
@@ -98,7 +113,6 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
     CREATE DATA mr_wa LIKE LINE OF <tab>.
     ASSIGN mr_wa->* TO FIELD-SYMBOL(<wa>).
 
-    DATA(lv_special_fields) = abap_false.
     DATA(lt_fields) = get_util( )->get_ddic_fields_from_struc( <wa> ).
 
 
@@ -129,6 +143,36 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
     IF lv_special_fields EQ abap_true
       OR ms_params-duplicates_allowed EQ abap_false.
       LOOP AT <tab> ASSIGNING <wa>.
+        DATA(lv_tabix) = sy-tabix.
+
+*       call exit first
+        IF mr_exit IS NOT INITIAL.
+          TRY.
+              IF mr_exit->modify_incoming_record(
+                  EXPORTING
+                     it_fields = lt_fields
+                  IMPORTING
+                     ev_skip   = lv_exit_skip
+                     ev_message = lv_message
+                  CHANGING
+                     cs_data   = <wa>
+            ) EQ abap_false.
+                ev_message = |processing stopped by exit { is_params-exit_class } - { lv_message } - { lv_tabix }/{ lv_lin }|.
+                RETURN.
+              ELSE.
+                IF lv_exit_skip EQ abap_true.
+                  DELETE <tab>.
+                  CONTINUE.
+                ENDIF.
+              ENDIF.
+            CATCH cx_root INTO DATA(lx_exc).
+              lv_message = lx_exc->get_text( ).
+              ev_message = |Error calling exit { is_params-exit_class } - { lv_message } - { lv_tabix }/{ lv_lin }|.
+              RETURN.
+          ENDTRY.
+
+        ENDIF.
+
 
 *       set timestamp
         IF lv_special_timestamp EQ abap_true.
@@ -206,4 +250,28 @@ CLASS ZCL_DEEB_UT_TABLE_UPDATE IMPLEMENTATION.
     ENDIF.
     rr_util = mr_util.
   ENDMETHOD.
+
+
+  method ZIF_DEEB_UT_TABLE_UPDATE~GET_EXIT.
+    rr_exit = mr_exit.
+  endmethod.
+
+
+  METHOD zif_deeb_ut_table_update~init_exit.
+    TRY.
+        mr_exit ?= zcl_deeb_factory=>create_instance( iv_type ).
+        IF mr_exit IS NOT INITIAL.
+          rv_success = abap_true.
+        ENDIF.
+      CATCH cx_root INTO DATA(lx_exc).
+        ev_error = lx_exc->get_text( ).
+    ENDTRY.
+  ENDMETHOD.
+
+
+  method ZIF_DEEB_UT_TABLE_UPDATE~IS_EXIT_AVAILABLE.
+    if mr_exit is NOT INITIAL.
+      rv_exit = abap_true.
+    endif.
+  endmethod.
 ENDCLASS.

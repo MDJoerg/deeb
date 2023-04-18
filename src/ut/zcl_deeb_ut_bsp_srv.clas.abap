@@ -64,26 +64,6 @@ CLASS ZCL_DEEB_UT_BSP_SRV IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD GET_REQUEST.
-* ------- check context
-    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
-      RETURN.
-    ELSE.
-      rr_request = ZIF_DEEB_UT_BSP_SRV~m_bsp_page->if_bsp_page~get_request( ).
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD GET_RESPONSE.
-* ------- check context
-    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
-      RETURN.
-    ELSE.
-      rr_response = ZIF_DEEB_UT_BSP_SRV~m_bsp_page->if_bsp_page~get_response( ).
-    ENDIF.
-  ENDMETHOD.
-
-
   METHOD GET_VERSION.
     rv_version = zif_deeb_c=>version.
   ENDMETHOD.
@@ -135,28 +115,6 @@ CLASS ZCL_DEEB_UT_BSP_SRV IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD SET_RESPONSE_STRING.
-
-* ------- check context
-    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
-      RETURN.
-    ENDIF.
-
-
-* ----- get response and set status
-    DATA: lv_xstring TYPE xstring.
-
-* ----- map to binary
-    DATA(lv_xcontent) = convert_string_to_xstring( iv_content ).
-
-* ----- set as binary
-    rv_success = set_response_xstring(
-                     iv_xcontent     = lv_xcontent
-                     iv_content_type = iv_content_type
-    ).
-  ENDMETHOD.
-
-
   METHOD SET_RESPONSE_XSTRING.
 
 * ------- check context
@@ -201,4 +159,46 @@ CLASS ZCL_DEEB_UT_BSP_SRV IMPLEMENTATION.
         iv_content_type = 'text/text'
     ).
   endmethod.
+
+
+  METHOD GET_REQUEST.
+* ------- check context
+    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
+      RETURN.
+    ELSE.
+      rr_request = ZIF_DEEB_UT_BSP_SRV~m_bsp_page->if_bsp_page~get_request( ).
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD GET_RESPONSE.
+* ------- check context
+    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
+      RETURN.
+    ELSE.
+      rr_response = ZIF_DEEB_UT_BSP_SRV~m_bsp_page->if_bsp_page~get_response( ).
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD SET_RESPONSE_STRING.
+
+* ------- check context
+    IF ZIF_DEEB_UT_BSP_SRV~m_bsp_page IS INITIAL.
+      RETURN.
+    ENDIF.
+
+
+* ----- get response and set status
+    DATA: lv_xstring TYPE xstring.
+
+* ----- map to binary
+    DATA(lv_xcontent) = convert_string_to_xstring( iv_content ).
+
+* ----- set as binary
+    rv_success = set_response_xstring(
+                     iv_xcontent     = lv_xcontent
+                     iv_content_type = iv_content_type
+    ).
+  ENDMETHOD.
 ENDCLASS.

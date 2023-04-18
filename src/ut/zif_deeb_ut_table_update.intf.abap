@@ -23,4 +23,17 @@ interface ZIF_DEEB_UT_TABLE_UPDATE
   methods GET_UTIL
     returning
       value(RR_UTIL) type ref to ZIF_DEEB_UT_DDIC_UTIL .
+  methods GET_EXIT
+    returning
+      value(RR_EXIT) type ref to ZIF_DEEB_EXIT_TABLE_UPDATE .
+  methods IS_EXIT_AVAILABLE
+    returning
+      value(RV_EXIT) type ABAP_BOOL .
+  methods INIT_EXIT
+    importing
+      !IV_TYPE type DATA
+    exporting
+      !EV_ERROR type STRING
+    returning
+      value(RV_SUCCESS) type ABAP_BOOL .
 endinterface.

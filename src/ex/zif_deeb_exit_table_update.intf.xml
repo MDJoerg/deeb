@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_INTF" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOINTERF>
+    <CLSNAME>ZIF_DEEB_EXIT_TABLE_UPDATE</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>DEEB: Exit Table Update</DESCRIPT>
+    <EXPOSURE>2</EXPOSURE>
+    <STATE>1</STATE>
+    <UNICODE>X</UNICODE>
+   </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CMPNAME>MODIFY_INCOMING_RECORD</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>check record field and modify fields (before save)</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CMPNAME>MODIFY_INCOMING_RECORD</CMPNAME>
+     <LANGU>F</LANGU>
+     <DESCRIPT>check record field and modify fields (before save)</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>MODIFY_INCOMING_RECORD</CMPNAME>
+     <SCONAME>IT_FIELDS</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>DD: Field List</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>MODIFY_INCOMING_RECORD</CMPNAME>
+     <SCONAME>IT_FIELDS</SCONAME>
+     <LANGU>F</LANGU>
+     <DESCRIPT>DD: Field List</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
+  </asx:values>
+ </asx:abap>
+</abapGit>

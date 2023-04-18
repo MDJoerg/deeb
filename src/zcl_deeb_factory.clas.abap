@@ -33,6 +33,21 @@ ENDCLASS.
 CLASS ZCL_DEEB_FACTORY IMPLEMENTATION.
 
 
+  METHOD create_table_updater.
+    rr_instance ?= create_instance( 'ZIF_DEEB_UT_TABLE_UPDATE' ).
+  ENDMETHOD.
+
+
+  method CREATE_JSON_CONVERTER.
+    rr_instance ?= create_instance( 'ZIF_DEEB_UT_JSON_CONVERT' ).
+  endmethod.
+
+
+  METHOD CREATE_DDIC_UTIL.
+    rr_instance ?= create_instance( 'ZIF_DEEB_UT_DDIC_UTIL' ).
+  ENDMETHOD.
+
+
   METHOD create_instance.
 
     DATA lv_type(30).
@@ -60,20 +75,5 @@ CLASS ZCL_DEEB_FACTORY IMPLEMENTATION.
 
     ENDIF.
 
-  ENDMETHOD.
-
-
-  method CREATE_JSON_CONVERTER.
-    rr_instance ?= create_instance( 'ZIF_DEEB_UT_JSON_CONVERT' ).
-  endmethod.
-
-
-  METHOD create_table_updater.
-    rr_instance ?= create_instance( 'ZIF_DEEB_UT_TABLE_UPDATE' ).
-  ENDMETHOD.
-
-
-  METHOD CREATE_DDIC_UTIL.
-    rr_instance ?= create_instance( 'ZIF_DEEB_UT_DDIC_UTIL' ).
   ENDMETHOD.
 ENDCLASS.
